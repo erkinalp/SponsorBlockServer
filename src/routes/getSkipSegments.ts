@@ -218,7 +218,7 @@ async function getSegmentsFromDBByHash(hashedVideoIDPrefix: VideoIDHash, service
     const fetchFromDB = () => db
         .prepare(
             "all",
-            `SELECT "videoID", "startTime", "endTime", "votes", "locked", "UUID", "userID", "category", "actionType", "videoDuration", "hidden", "reputation", "shadowHidden", "hashedVideoID", "timeSubmitted", "description" FROM "sponsorTimes"
+            `SELECT "videoID", "startTime", "endTime", "votes", "locked", "UUID", "userID", "category", "actionType", "videoDuration", "hidden", "reputation", "shadowHidden", "hashedVideoID", "timeSubmitted", "description", "cropLeft", "cropRight", "cropTop", "cropBottom" FROM "sponsorTimes"
             WHERE "hashedVideoID" LIKE ? AND "service" = ? ORDER BY "startTime"`,
             [`${hashedVideoIDPrefix}%`, service],
             { useReplica: true }
@@ -237,7 +237,7 @@ async function getSegmentsFromDBByVideoID(videoID: VideoID, service: Service): P
     const fetchFromDB = () => db
         .prepare(
             "all",
-            `SELECT "startTime", "endTime", "votes", "locked", "UUID", "userID", "category", "actionType", "videoDuration", "hidden", "reputation", "shadowHidden", "timeSubmitted", "description" FROM "sponsorTimes" 
+            `SELECT "startTime", "endTime", "votes", "locked", "UUID", "userID", "category", "actionType", "videoDuration", "hidden", "reputation", "shadowHidden", "timeSubmitted", "description", "cropLeft", "cropRight", "cropTop", "cropBottom" FROM "sponsorTimes" 
             WHERE "videoID" = ? AND "service" = ? ORDER BY "startTime"`,
             [videoID, service],
             { useReplica: true }
