@@ -5,7 +5,7 @@ import { HashedUserID, UserID } from "./user.model";
 export type SegmentUUID = string & { __segmentUUIDBrand: unknown };
 export type VideoID = string & { __videoIDBrand: unknown };
 export type VideoDuration = number & { __videoDurationBrand: unknown };
-export type Category = ("sponsor" | "selfpromo" | "interaction" | "intro" | "outro" | "preview" | "music_offtopic" | "poi_highlight" | "chapter" | "filler" | "exclusive_access") & { __categoryBrand: unknown };
+export type Category = ("sponsor" | "selfpromo" | "interaction" | "intro" | "outro" | "preview" | "music_offtopic" | "poi_highlight" | "chapter" | "filler" | "exclusive_access" | "windowbox") & { __categoryBrand: unknown };
 export type DeArrowType = "title" | "thumbnail";
 export type VideoIDHash = VideoID & HashedValue;
 export type IPAddress = string & { __ipAddressBrand: unknown };
@@ -16,7 +16,8 @@ export enum ActionType {
     Mute = "mute",
     Chapter = "chapter",
     Full = "full",
-    Poi = "poi"
+    Poi = "poi",
+    Crop = "crop"
 }
 
 // Uncomment as needed
@@ -35,6 +36,10 @@ export interface IncomingSegment {
     actionType: ActionType;
     segment: string[];
     description?: string;
+    cropLeft?: number;
+    cropRight?: number;
+    cropTop?: number;
+    cropBottom?: number;
 
     // Used to remove in pre-check stage
     ignoreSegment?: boolean;
@@ -49,6 +54,10 @@ export interface Segment {
     locked: boolean;
     votes: number;
     description: string;
+    cropLeft?: number;
+    cropRight?: number;
+    cropTop?: number;
+    cropBottom?: number;
 }
 
 export enum Visibility {
@@ -78,6 +87,10 @@ export interface DBSegment {
     userAgent: string;
     service: Service;
     description: string;
+    cropLeft?: number;
+    cropRight?: number;
+    cropTop?: number;
+    cropBottom?: number;
 }
 
 export interface OverlappingSegmentGroup {

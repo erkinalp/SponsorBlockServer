@@ -302,6 +302,34 @@ async function checkEachSegmentValid(rawIP: IPAddress, paramUserID: UserID, user
             return { pass: false, errorMessage: "ActionType is not supported with this category.", errorCode: 400 };
         }
 
+        if (segments[i].actionType === ActionType.Crop) {
+            const cropFields = [
+                { name: 'cropLeft', value: segments[i].cropLeft },
+                { name: 'cropRight', value: segments[i].cropRight },
+                { name: 'cropTop', value: segments[i].cropTop },
+                { name: 'cropBottom', value: segments[i].cropBottom }
+            ];
+            for (const field of cropFields) {
+                if (field.value !== undefined) {
+                    if (!Number.isInteger(field.value) || field.value < 0 || field.value > 255) {
+                        return { pass: false, errorMessage: `${field.name} must be an integer between 0 and 255.`, errorCode: 400 };
+                    }
+                }
+            }
+            
+            const leftValue = segments[i].cropLeft || 0;
+            const rightValue = segments[i].cropRight || 0;
+            const topValue = segments[i].cropTop || 0;
+            const bottomValue = segments[i].cropBottom || 0;
+            
+            if (leftValue + rightValue > 256) {
+                return { pass: false, errorMessage: "cropLeft + cropRight must not exceed 256.", errorCode: 400 };
+            }
+            if (topValue + bottomValue > 256) {
+                return { pass: false, errorMessage: "cropTop + cropBottom must not exceed 256.", errorCode: 400 };
+            }
+        }
+
         const startTime = parseFloat(segments[i].segment[0]);
         const endTime = parseFloat(segments[i].segment[1]);
 
@@ -612,10 +640,10 @@ export async function postSkipSegments(req: Request, res: Response): Promise<Res
             const startingLocked = isVIP ? 1 : 0;
             try {
                 await db.prepare("run", `INSERT INTO "sponsorTimes" 
-                    ("videoID", "startTime", "endTime", "votes", "locked", "UUID", "userID", "timeSubmitted", "views", "category", "actionType", "service", "videoDuration", "reputation", "shadowHidden", "hashedVideoID", "userAgent", "description")
-                    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+                    ("videoID", "startTime", "endTime", "votes", "locked", "UUID", "userID", "timeSubmitted", "views", "category", "actionType", "service", "videoDuration", "reputation", "shadowHidden", "hashedVideoID", "userAgent", "description", "cropLeft", "cropRight", "cropTop", "cropBottom")
+                    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
                     videoID, segmentInfo.segment[0], segmentInfo.segment[1], startingVotes, startingLocked, UUID, userID, timeSubmitted, 0
-                    , segmentInfo.category, segmentInfo.actionType, service, videoDuration, reputation, isBanned ? 1 : 0, hashedVideoID, userAgent, segmentInfo.description
+                    , segmentInfo.category, segmentInfo.actionType, service, videoDuration, reputation, isBanned ? 1 : 0, hashedVideoID, userAgent, segmentInfo.description, segmentInfo.cropLeft, segmentInfo.cropRight, segmentInfo.cropTop, segmentInfo.cropBottom
                 ],
                 );
 
